@@ -1,7 +1,9 @@
 package dev.shubham.productservice.services;
 
 import dev.shubham.productservice.dtos.FakeStoreResponseDto;
+import dev.shubham.productservice.exceptions.ProductNotFoundException;
 import dev.shubham.productservice.models.Product;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,10 +21,10 @@ public class FakeProductService implements ProductService {
 
     @Override
     public List<Product> getProduct() {
-        FakeStoreResponseDto[] response = restTemplate.getForObject("https://fakestoreapi.com/products", FakeStoreResponseDto[].class);
+        ResponseEntity response = restTemplate.getForEntity("https://fakestoreapi.com/products", FakeStoreResponseDto[].class);
+        FakeStoreResponseDto[] response1 = (FakeStoreResponseDto[]) response.getBody();
         ArrayList<Product> products = new ArrayList<>();
-        assert response != null;
-        for (FakeStoreResponseDto fakeStoreResponseDto : response) {
+        for (FakeStoreResponseDto fakeStoreResponseDto : response1) {
             products.add(fakeStoreResponseDto.toProduct());
         }
         return products;
@@ -41,16 +43,18 @@ public class FakeProductService implements ProductService {
         fakeStoreResponseDto.setCategory(category);
         fakeStoreResponseDto.setImage(imageUrl);
 
-        FakeStoreResponseDto response = restTemplate.postForObject("https://fakestoreapi.com/products", fakeStoreResponseDto, FakeStoreResponseDto.class);
-        assert response != null;
-        return response.toProduct();
-
+        ResponseEntity response = restTemplate.postForEntity("https://fakestoreapi.com/products", fakeStoreResponseDto, FakeStoreResponseDto.class);
+        FakeStoreResponseDto fakeStoreResponseDto1 = (FakeStoreResponseDto) response.getBody();
+        return fakeStoreResponseDto1.toProduct();
     }
 
     @Override
-    public Product getProductById(String id) {
-        FakeStoreResponseDto fakeStoreResponseDto = restTemplate.getForObject("https://fakestoreapi.com/products/" + id, FakeStoreResponseDto.class);
-        assert fakeStoreResponseDto != null;
+    public Product getProductById(String id) throws ProductNotFoundException {
+        ResponseEntity response = restTemplate.getForEntity("https://fakestoreapi.com/products/" + id, FakeStoreResponseDto.class);
+        FakeStoreResponseDto fakeStoreResponseDto = (FakeStoreResponseDto) response.getBody();
+        if (fakeStoreResponseDto == null) {
+            throw new ProductNotFoundException("Product with id: " + id + " doesn't exist. Retry some other product.");
+        }
         return fakeStoreResponseDto.toProduct();
     }
 
@@ -74,10 +78,10 @@ public class FakeProductService implements ProductService {
 
     @Override
     public List<Product> getProductByCategory(String category){
-        FakeStoreResponseDto[] response = restTemplate.getForObject("https://fakestoreapi.com/products/category/" + category, FakeStoreResponseDto[].class);
+        ResponseEntity response = restTemplate.getForEntity("https://fakestoreapi.com/products/category/" + category, FakeStoreResponseDto[].class);
+        FakeStoreResponseDto[] responseData = (FakeStoreResponseDto[]) response.getBody();
         ArrayList<Product> products = new ArrayList<>();
-        assert response != null;
-        for (FakeStoreResponseDto fakeStoreResponseDto : response) {
+        for (FakeStoreResponseDto fakeStoreResponseDto : responseData) {
             products.add(fakeStoreResponseDto.toProduct());
         }
         return products;
@@ -85,10 +89,10 @@ public class FakeProductService implements ProductService {
 
     @Override
     public List<String> getCategories(){
-        String[] response = restTemplate.getForObject("https://fakestoreapi.com/products/categories", String[].class);
+        ResponseEntity response = restTemplate.getForEntity("https://fakestoreapi.com/products/categories", String[].class);
+        String[] response1 = (String[]) response.getBody();
         ArrayList<String> categories = new ArrayList<>();
-        assert response != null;
-        for (String category : response) {
+        for (String category : response1) {
             categories.add(category);
         }
         return categories;

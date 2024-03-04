@@ -1,5 +1,6 @@
 package dev.shubham.productservice.services;
 
+import dev.shubham.productservice.exceptions.ProductNotFoundException;
 import dev.shubham.productservice.models.Category;
 import dev.shubham.productservice.models.Product;
 
@@ -9,7 +10,7 @@ public interface ProductService {
 
     public List<Product> getProduct();
 
-    public Product getProductById(String id);
+    public Product getProductById(String id) throws ProductNotFoundException;
 
     public Product addProduct(String title,
                               String description,
