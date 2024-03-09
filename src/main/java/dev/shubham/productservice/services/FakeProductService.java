@@ -9,8 +9,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-@Service
+@Service("fakeProductService")
 public class FakeProductService implements ProductService {
 
     private final RestTemplate restTemplate;
@@ -49,7 +50,7 @@ public class FakeProductService implements ProductService {
     }
 
     @Override
-    public Product getProductById(String id) throws ProductNotFoundException {
+    public Product getProductById(Long id) throws ProductNotFoundException {
         ResponseEntity response = restTemplate.getForEntity("https://fakestoreapi.com/products/" + id, FakeStoreResponseDto.class);
         FakeStoreResponseDto fakeStoreResponseDto = (FakeStoreResponseDto) response.getBody();
         if (fakeStoreResponseDto == null) {
@@ -59,7 +60,7 @@ public class FakeProductService implements ProductService {
     }
 
     @Override
-    public Product updateProduct(String id,String title,String description, double price,String imageUrl,String category) {
+    public Product updateProduct(Long id,String title,String description, double price,String imageUrl,String category) {
         FakeStoreResponseDto update = new FakeStoreResponseDto();
         update.setTitle(title);
         update.setDescription(description);
@@ -72,7 +73,7 @@ public class FakeProductService implements ProductService {
 
     }
     @Override
-    public void deleteProduct(String id) {
+    public void deleteProduct(Long id) {
         restTemplate.delete("https://fakestoreapi.com/products/" + id);
     }
 
