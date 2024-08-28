@@ -2,6 +2,7 @@ package dev.shubham.productservice.services;
 
 import dev.shubham.productservice.exceptions.ProductNotFoundException;
 import dev.shubham.productservice.models.Product;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,4 +25,7 @@ public interface ProductService {
 
     public List<Product> getProductByCategory(String category);
     public List<String> getCategories();
+    boolean generateProductData();
+
+    Page<Product> getProducts(Integer pageSize,Integer pageNumber,String sort);
 }

@@ -3,6 +3,7 @@ package dev.shubham.productservice.services;
 import dev.shubham.productservice.dtos.FakeStoreResponseDto;
 import dev.shubham.productservice.exceptions.ProductNotFoundException;
 import dev.shubham.productservice.models.Product;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -97,6 +98,16 @@ public class FakeProductService implements ProductService {
             categories.add(category);
         }
         return categories;
+    }
+
+    @Override
+    public boolean generateProductData() {
+        return false;
+    }
+
+    @Override
+    public Page<Product> getProducts(Integer pageSize,Integer pageNumber,String sort) {
+        return null;
     }
 
 }

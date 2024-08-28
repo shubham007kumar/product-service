@@ -1,17 +1,19 @@
 package dev.shubham.productservice.services;
 
-import dev.shubham.productservice.dtos.CreateFakeStoreRequestDto;
-import dev.shubham.productservice.dtos.FakeStoreResponseDto;
 import dev.shubham.productservice.exceptions.ProductNotFoundException;
 import dev.shubham.productservice.models.Category;
 import dev.shubham.productservice.models.Product;
 import dev.shubham.productservice.repositories.CategoryRepository;
 import dev.shubham.productservice.repositories.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Random;
 
 @Service("selfProductService")
 public class SelfProductService implements ProductService {
@@ -83,5 +85,48 @@ public class SelfProductService implements ProductService {
             categories.add(category1.getTitle());
         }
         return categories;
+    }
+
+    private static final String[] PRODUCT_NAMES = {
+            "TV", "Headphones", "Smartphone", "Laptop", "Tablet",
+            "Camera", "Speaker", "Drone", "Gaming Console", "Smartwatch",
+            "Fitness Tracker", "External Hard Drive", "Monitor", "Router",
+            "Printer", "Keyboard", "Mouse", "Earbuds", "Projector", "Desk"
+    };
+    private static final String[] CATEGORY_NAMES = {
+            "Electronics","HOME","SPORT"
+    };
+    @Override
+    public boolean generateProductData() {
+        List<Product> products = new ArrayList<>();
+        Random random = new Random();
+
+        for (int i = 0; i < 20; i++) {
+            String productName = PRODUCT_NAMES[random.nextInt(PRODUCT_NAMES.length)];
+            int productPrice = random.nextInt(10000) + 100; // Random price between 100 and 10000
+            Product product = new Product();
+            Category category = new Category();
+            product.setTitle(productName + " " + (i + 1));
+            product.setDescription("Description for " + productName + " " + (i + 1));
+            product.setPrice(productPrice);
+            product.setImageUrl("path/to/image_" + productName.toLowerCase() + "_" + (i + 1) + ".jpg");
+            String categoryName = CATEGORY_NAMES[random.nextInt(CATEGORY_NAMES.length)];
+            category.setTitle(categoryName);
+            product.setCategory(category);
+            products.add(product);
+        }
+        productRepository.saveAll(products);
+        return true;
+    }
+
+    @Override
+    public Page<Product> getProducts(Integer pageSize,Integer pageNumber,String sort) {
+        Pageable pageable = null;
+        if(sort != null){
+          pageable = PageRequest.of(pageNumber,pageSize, Sort.Direction.DESC,sort);
+        }else{
+           pageable = PageRequest.of(pageNumber,pageSize);
+        }
+        return productRepository.findAll(pageable);
     }
 }
